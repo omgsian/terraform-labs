@@ -183,6 +183,7 @@ resource "aws_launch_template" "prod_lt" {
   image_id      = var.linux-ami
   instance_type = "t2.micro"
   user_data     = filebase64("server_cmds.sh")
+  key_name      = "mrh-aws"
 
   network_interfaces {
     associate_public_ip_address = false
@@ -199,15 +200,15 @@ resource "aws_launch_template" "prod_lt" {
 
 resource "aws_autoscaling_group" "prod_asg" {
   # no of instances
-  desired_capacity = 4
+  desired_capacity = 2
   min_size         = 2
-  max_size         = 10
+  max_size         = 4
 
   # Connect to the target group
   target_group_arns = [aws_lb_target_group.prod_lb_tg.arn]
 
-  vpc_zone_identifier = [ # Creating EC2 instances in private subnet
-    aws_subnet.prod_subnet2.id
+  vpc_zone_identifier = [
+    aws_subnet.prod_subnet2.id # Creating EC2 instances in private subnet
   ]
 
   launch_template {
@@ -249,5 +250,3 @@ output "alb_dns_name" {
   value       = aws_lb.prod_lb.dns_name
   description = "The domain name of the load balancer"
 }
-
-
