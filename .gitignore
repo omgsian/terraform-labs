@@ -1,0 +1,10 @@
+#Ignore all files
+*
+
+# Except for..
+!.gitignore
+!README.md
+!*.tf
+
+# even if they're in subdirs...
+!*/
