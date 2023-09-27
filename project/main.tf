@@ -1,36 +1,4 @@
 
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
-
-# Configure the AWS Provider
-provider "aws" {
-  region = "us-east-1"
-}
-
-variable "ssh_port" {
-  description = "the port ssh connection is made to"
-  type        = number
-  default     = 22
-}
-
-variable "web_server_port" {
-  description = "the port http traffic is sent to"
-  type        = number
-  default     = 80
-}
-
-variable "web_secure_server_port" {
-  description = "the port https traffic is sent to"
-  type        = number
-  default     = 443
-}
-
 resource "aws_vpc" "demo_vpc" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
@@ -56,6 +24,7 @@ resource "aws_route_table" "route_table" {
     Name = "prod-RT"
   }
 
+
 }
 
 resource "aws_subnet" "demo_subnet" {
@@ -66,8 +35,8 @@ resource "aws_subnet" "demo_subnet" {
   tags = {
     Name = "prod_subnet"
   }
-}
 
+}
 
 resource "aws_route_table_association" "route_table_asso" {
   subnet_id      = aws_subnet.demo_subnet.id
@@ -171,39 +140,7 @@ resource "aws_instance" "webserver" {
   user_data_replace_on_change = true
 
   tags = {
-    Name = "web_server"
-  }
-}
-
-resource "aws_launch_configuration" "as_conf" {
-  image_id        = "ami-053b0d53c279acc90"
-  instance_type   = "t2.micro"
-  security_groups = [aws_security_group.allow_web.id]
-
-  user_data = <<-EOF
-              #!/bin/bash
-              sudo apt -y update 
-              sudo apt -y install apache2 
-              sudo systemctl start apache2
-              sudo bash -c 'echo My First Web Server > /var/www/html/index.html'
-              EOF
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_autoscaling_group" "example" {
-  launch_configuration = aws_launch_configuration.as_conf.name
-  vpc_zone_identifier  = data.aws_subnets.default.ids
-  health_check_type    = "ELB"
-  min_size             = 2
-  max_size             = 10
-
-  tag {
-    key                 = "Name"
-    value               = "terraform-asg-example"
-    propagate_at_launch = true
+    Name = "web-server"
   }
 }
 
