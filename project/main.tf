@@ -56,11 +56,6 @@ resource "aws_route_table" "route_table" {
     Name = "prod-RT"
   }
 
-  #   route {
-  #     ipv6_cidr_block = "::/0"
-  #     gateway_id      = aws_internet_gateway.gw.id
-  #   }
-
 }
 
 resource "aws_subnet" "demo_subnet" {
@@ -71,8 +66,8 @@ resource "aws_subnet" "demo_subnet" {
   tags = {
     Name = "prod_subnet"
   }
-
 }
+
 
 resource "aws_route_table_association" "route_table_asso" {
   subnet_id      = aws_subnet.demo_subnet.id
@@ -136,19 +131,6 @@ resource "aws_security_group" "allow_web" {
   }
 }
 
-# resource "aws_network_interface" "webserver-nic" {
-#   subnet_id       = aws_subnet.demo_subnet.id
-#   private_ips     = ["10.0.1.50"]
-#   security_groups = [aws_security_group.allow_web.id]
-# }
-
-# resource "aws_eip" "one" {
-#   domain                    = "vpc"
-#   network_interface         = aws_network_interface.web-server-nic.id
-#   associate_with_private_ip = "10.0.1.50"
-#   depends_on                = [aws_internet_gateway.gw]
-# }
-
 # create a network interface with private ip from step 4
 resource "aws_network_interface" "terra_net_interface" {
   subnet_id       = aws_subnet.demo_subnet.id
@@ -158,6 +140,7 @@ resource "aws_network_interface" "terra_net_interface" {
     Name = "prod_nic"
   }
 }
+
 # assign a elastic ip to the network interface created in step 7
 resource "aws_eip" "terra_eip" {
   domain                    = "vpc"
@@ -188,38 +171,41 @@ resource "aws_instance" "webserver" {
   user_data_replace_on_change = true
 
   tags = {
-    Name = "web-server"
+    Name = "web_server"
   }
 }
 
-# resource "aws_launch_configuration" "as_conf" {
-#   image_id        = "ami-053b0d53c279acc90"
-#   instance_type   = "t2.micro"
-#   security_groups = [aws_security_group.allow_web.id]
+resource "aws_launch_configuration" "as_conf" {
+  image_id        = "ami-053b0d53c279acc90"
+  instance_type   = "t2.micro"
+  security_groups = [aws_security_group.allow_web.id]
 
-#   user_data = <<-EOF
-#               #!/bin/bash
-#               sudo apt -y update 
-#               sudo apt -y install apache2 
-#               sudo systemctl start apache2
-#               sudo bash -c 'echo My First Web Server > /var/www/html/index.html'
-#               EOF
+  user_data = <<-EOF
+              #!/bin/bash
+              sudo apt -y update 
+              sudo apt -y install apache2 
+              sudo systemctl start apache2
+              sudo bash -c 'echo My First Web Server > /var/www/html/index.html'
+              EOF
 
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 
-# resource "aws_autoscaling_group" "as_group" {
-#   launch_configuration = aws_launch_configuration.as_conf.name_prefix
-#   min_size             = 2
-#   max_size             = 5
-#   tag {
-#     key                 = "Name"
-#     value               = "scaling group"
-#     propagate_at_launch = true
-#   }
-# }
+resource "aws_autoscaling_group" "example" {
+  launch_configuration = aws_launch_configuration.as_conf.name
+  vpc_zone_identifier  = data.aws_subnets.default.ids
+  health_check_type    = "ELB"
+  min_size             = 2
+  max_size             = 10
+
+  tag {
+    key                 = "Name"
+    value               = "terraform-asg-example"
+    propagate_at_launch = true
+  }
+}
 
 output "public_ip" {
   value = aws_instance.webserver.public_ip
