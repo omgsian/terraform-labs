@@ -42,12 +42,12 @@ resource "aws_route_table" "rt" {
   vpc_id = aws_vpc.default.id
 
   route {
-    cidr_block = ["0.0.0.0/0"]
+    cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.gw.id
   }
 
   tags = {
-    Name : prod_rt
+    Name = "prod_rt"
   }
 }
 
@@ -65,7 +65,7 @@ resource "aws_route_table_association" "rta_2" {
 
 resource "aws_eip" "eip" {
   depends_on = [aws_internet_gateway.gw]
-  vpc        = true
+  domain     = "vpc"
   tags = {
     Name = "prod_eip"
   }
