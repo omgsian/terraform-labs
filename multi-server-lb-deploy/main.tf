@@ -186,7 +186,7 @@ resource "aws_launch_template" "prod_lt" {
   key_name      = "mrh-aws"
 
   network_interfaces {
-    associate_public_ip_address = false
+    associate_public_ip_address = true
     subnet_id                   = aws_subnet.prod_subnet2.id
     security_groups             = [aws_security_group.ec2_sg.id]
   }
