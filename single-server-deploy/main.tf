@@ -50,40 +50,40 @@ resource "aws_security_group" "allow_web" {
 
   ingress {
     description = "HTTPS"
-    from_port   = var.web_secure_server_port
-    to_port     = var.web_secure_server_port
+    from_port   = var.server_ports[2].port
+    to_port     = var.server_ports[2].port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
     description = "HTTP"
-    from_port   = var.web_server_port
-    to_port     = var.web_server_port
+    from_port   = var.server_ports[1].port
+    to_port     = var.server_ports[1].port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
     description      = "HTTPS ipv6"
-    from_port        = var.web_secure_server_port
-    to_port          = var.web_secure_server_port
+    from_port        = var.server_ports[2].port
+    to_port          = var.server_ports[2].port
     protocol         = "tcp"
     ipv6_cidr_blocks = ["::/0"]
   }
 
   ingress {
     description      = "HTTP ipv6"
-    from_port        = var.web_server_port
-    to_port          = var.web_server_port
+    from_port        = var.server_ports[1].port
+    to_port          = var.server_ports[1].port
     protocol         = "tcp"
     ipv6_cidr_blocks = ["::/0"]
   }
 
   ingress {
     description = "SSH"
-    from_port   = var.ssh_port
-    to_port     = var.ssh_port
+    from_port   = var.server_ports[0].port
+    to_port     = var.server_ports[0].port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
