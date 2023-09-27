@@ -119,7 +119,7 @@ resource "aws_eip" "terra_eip" {
 }
 
 resource "aws_instance" "webserver" {
-  ami               = "ami-053b0d53c279acc90"
+  ami               = var.linux-ami
   instance_type     = "t2.micro"
   availability_zone = "us-east-1a"
   key_name          = "mrh-aws"

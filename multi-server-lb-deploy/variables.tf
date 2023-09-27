@@ -12,3 +12,9 @@ variable "server_ports" {
     { name = "lb_port", port = 8080 },
   ]
 }
+
+variable "linux-ami" {
+  description = "the ami for the ubuntu os used"
+  type        = string
+  default     = "ami-053b0d53c279acc90"
+}
