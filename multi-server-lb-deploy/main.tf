@@ -112,7 +112,7 @@ resource "aws_lb" "prod_lb" {
 }
 
 resource "aws_lb_target_group" "prod_lb_tg" {
-  name     = "load balancer target group"
+  name     = "load-balancer-tg"
   port     = var.server_ports[1].port
   protocol = "HTTP"
   vpc_id   = aws_vpc.default.id
